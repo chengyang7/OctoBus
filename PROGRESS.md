@@ -130,14 +130,14 @@
   - 验收标准：所有提交前失败场景 store 中无新增 service；错误信息包含 service root 或 service id 上下文。
   - 完成总结：已新增 `TestImporterImportRecursivePrevalidationFailuresKeepStoreEmpty`，覆盖重复 `service.json.name`、非法 service id、缺 root `package.json bin` entry、缺 schema 文件、坏 proto、空 scan root 和缺失 scan root。每个用例均断言错误包含 service root/scan root 或失败类型上下文，并确认 store 中没有新增 service。当前 3.2 实现已在提交前完成这些 discovery/manifest/ID/bin/schema/descriptor 校验，因此本阶段无需改实现。验证命令：`go test ./internal/packageimport`，结果通过。
 
-- [ ] 3.4 验证重导入展示名保留
+- [x] 3.4 验证重导入展示名保留
   - 依赖：3.2。
   - 工作内容：覆盖 recursive import 更新已有 service 时沿用现有 `importServiceName` 规则：未传 name 时保留用户改过的展示名。
   - 可并行子任务：
-    - [ ] 可并行：写 store rename 后 recursive reimport 测试。
+    - [x] 可并行：写 store rename 后 recursive reimport 测试。
   - 测试方案：`go test ./internal/packageimport`。
   - 验收标准：重导入不覆盖用户手动修改的 `Service.Name`。
-  - 完成总结：待完成。
+  - 完成总结：已新增 `TestImporterImportRecursiveReimportPreservesExistingName`，先 recursive import 多 service package，再通过 store 将 `alpha-service` 改为用户自定义展示名，随后 recursive reimport 另一份 package，断言返回结果和 store 中的 `alpha-service.Name` 均保留用户改名，未被 manifest displayName 覆盖；其他 service 仍使用 manifest displayName 默认规则。验证命令：`go test ./internal/packageimport`，结果通过。
 
 ## 4. Admin API 和重启编排
 

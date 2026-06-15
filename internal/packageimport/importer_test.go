@@ -258,6 +258,42 @@ func TestImporterImportRecursivePrevalidationFailuresKeepStoreEmpty(t *testing.T
 	}
 }
 
+func TestImporterImportRecursiveReimportPreservesExistingName(t *testing.T) {
+	ctx := context.Background()
+	dataDir, s := openTestStore(t)
+	firstPkg := writeMultiServiceTestPackage(t, t.TempDir())
+	secondPkg := writeMultiServiceTestPackage(t, t.TempDir())
+	updateMultiServiceManifestName(t, secondPkg.Root, "vendor__alpha", "alpha-service")
+	updateMultiServiceManifestName(t, secondPkg.Root, "vendor__beta", "beta-service")
+	updateMultiServiceManifestName(t, secondPkg.Root, "nested/vendor__gamma", "gamma-service")
+	imp := &Importer{DataDir: dataDir, Store: s}
+	if _, err := imp.ImportRecursive(ctx, Options{Source: firstPkg.Root, Recursive: true, Offline: true, Build: "never"}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := s.UpdateServiceMetadata(ctx, "alpha-service", "User Renamed Alpha"); err != nil {
+		t.Fatal(err)
+	}
+	res, err := imp.ImportRecursive(ctx, Options{Source: secondPkg.Root, Recursive: true, Offline: true, Build: "never"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, svc := range res.Services {
+		if svc.ID == "alpha-service" && svc.Name != "User Renamed Alpha" {
+			t.Fatalf("recursive reimport did not preserve existing name: %+v", svc)
+		}
+		if svc.ID == "beta-service" && svc.Name != "beta-service display" {
+			t.Fatalf("unexpected beta service name: %+v", svc)
+		}
+	}
+	stored, err := s.GetService(ctx, "alpha-service")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if stored.Name != "User Renamed Alpha" {
+		t.Fatalf("stored name=%q want preserved user name", stored.Name)
+	}
+}
+
 func TestImporterKeepsLocalExampleSDKAfterRuntimeDependencyPreparation(t *testing.T) {
 	dataDir, s := openTestStore(t)
 	root := t.TempDir()
