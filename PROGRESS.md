@@ -244,16 +244,16 @@
   - 验收标准：文档只承诺首版范围；不引入与 CLI 资源定位规范冲突的 `--id` 示例。
   - 完成总结：已更新 `README.md`、`README.zh-CN.md`、`docs/design/product/cli.md`、`docs/design/technical/multi-service-npm-package.md` 和 `docs/design/technical/service-package.md`，加入 `service import --recursive SOURCE` 示例、`npm:@chaitin-ai/octobus-tentacles` 用法，以及 `source//some-dir` 在 recursive 模式下作为 scan root 的说明；文档明确 recursive 模式 service id 来自 `service.json.name`，不承诺 `--all` alias。文档审计命令：`rg -n -- "--all|--recursive|service import --id" README.md README.zh-CN.md docs services/scripts services/tests`；结果仅包含 catalog 合法 `--all`、recursive 示例、spec/plan 中“不提供 --all alias”的说明，未出现 service import `--all` 或 `service import --id`。
 
-- [ ] 6.4 阶段收口验证
+- [x] 6.4 阶段收口验证
   - 依赖：6.1、6.2、6.3。
   - 工作内容：运行阶段性 focused tests 和 lint，确认代码、脚本、文档一致。
   - 可并行子任务：
-    - [ ] 可并行：Go focused tests。
-    - [ ] 可并行：Node script tests。
-    - [ ] 可并行：文档 grep 审计。
+    - [x] 可并行：Go focused tests。
+    - [x] 可并行：Node script tests。
+    - [x] 可并行：文档 grep 审计。
   - 测试方案：`go test ./internal/cli ./internal/admin ./internal/packageimport ./internal/integration`；`node --test services/tests/validate-service-package.test.mjs`；`task lint`。
   - 验收标准：阶段性测试全部通过，或完成总结记录明确环境阻塞和复现命令。
-  - 完成总结：待完成。
+  - 完成总结：阶段性 focused tests、Node script tests、文档审计和 lint 均已通过。验证命令：`go test ./internal/cli ./internal/admin ./internal/packageimport ./internal/integration`，结果通过；`node --test services/tests/validate-service-package.test.mjs`，结果通过；`rg -n -- "--all|--recursive|service import --id" README.md README.zh-CN.md docs services/scripts services/tests`，结果仅包含 catalog 合法 `--all`、recursive 示例和“不提供 --all alias”说明，未出现 service import `--all` 或 `service import --id`；`task lint`，结果通过。
 
 ## 7. 完整质量门禁和收尾
 
