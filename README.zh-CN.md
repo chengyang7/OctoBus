@@ -105,6 +105,12 @@ export OCTOBUS_ADDR="127.0.0.1:9000"
 - `protoc`：导入 service 时编译 proto descriptor
 - `git`：从 HTTPS Git source 导入 service 时拉取和归档 package
 
+如果 `go build` 或 `task build` 在下载 Go 模块时超时（例如 `proxy.golang.org` 报 `dial tcp ... i/o timeout`），可以配置 Go 模块代理：
+
+```bash
+go env -w GOPROXY=https://goproxy.cn,direct
+```
+
 ## 基本使用流程
 
 下面用仓库内置的 calculator 示例跑通一次完整流程。开始前先按上一节构建 binary、启动 daemon，并确认 CLI 能连上：
