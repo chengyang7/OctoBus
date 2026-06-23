@@ -114,6 +114,12 @@ To run the daemon locally and perform normal service import/start workflows, ins
 - `protoc`: compiles proto descriptors during service import
 - `git`: fetches and archives packages imported from HTTPS Git sources
 
+If `go build` or `task build` fails with timeouts when downloading Go modules (e.g. `dial tcp ... i/o timeout` from `proxy.golang.org`), you may need to configure a Go module proxy:
+
+```bash
+go env -w GOPROXY=https://goproxy.cn,direct
+```
+
 ## Basic Workflow
 
 The following example uses the built-in calculator service to run through a complete workflow. Before starting, build the binary, start the daemon as described above, and verify that the CLI can connect:
