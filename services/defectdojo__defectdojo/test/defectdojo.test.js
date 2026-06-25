@@ -62,6 +62,14 @@ test('helpers normalize bindings, scalars, booleans, query strings, and headers'
     () => _test.assertSupportedTlsConfig({ skipTlsVerify: true }),
     /skipTlsVerify is not supported/,
   );
+  assert.throws(
+    () => _test.assertSupportedTlsConfig({ tlsInsecureSkipVerify: true }),
+    /skipTlsVerify is not supported/,
+  );
+  assert.throws(
+    () => _test.assertSupportedTlsConfig({ insecureSkipVerify: true }),
+    /skipTlsVerify is not supported/,
+  );
   const multipart = _test.buildMultipartBody(
     { scan_type: 'ZAP Scan', active: 'true', empty: '' },
     { name: 'zap.xml', content: '<xml />', contentType: 'application/xml' },
