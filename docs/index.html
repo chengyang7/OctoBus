@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OctoBus</title>
+    <meta
+      name="description"
+      content="一个让智能体安全、可靠、可控地调用企业内部系统能力的平台，仅允许执行被授权的业务动作，并完整记录调用行为。"
+    />
+    <style>
+      :root {
+        --bg: #060d16;
+        --bg-2: #0a1320;
+        --panel: rgba(12, 20, 31, 0.9);
+        --panel-soft: rgba(18, 29, 45, 0.9);
+        --line: rgba(90, 157, 255, 0.16);
+        --line-strong: rgba(90, 157, 255, 0.28);
+        --text: #eef5ff;
+        --muted: #92a5bb;
+        --blue: #4d8dff;
+        --blue-strong: #2e7bff;
+        --blue-soft: rgba(77, 141, 255, 0.12);
+        --shadow: 0 28px 72px rgba(0, 0, 0, 0.34);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "SF Pro Display", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at 20% 18%, rgba(77, 141, 255, 0.18), transparent 24%),
+          radial-gradient(circle at 84% 16%, rgba(46, 123, 255, 0.14), transparent 18%),
+          linear-gradient(180deg, #08111b 0%, #050b12 100%);
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .page {
+        min-height: 100vh;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        backdrop-filter: blur(16px);
+        background: rgba(6, 12, 19, 0.72);
+        border-bottom: 1px solid rgba(90, 157, 255, 0.08);
+      }
+
+      .topbar-inner {
+        max-width: 1360px;
+        margin: 0 auto;
+        padding: 18px 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-weight: 700;
+      }
+
+      .brand-mark {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        background: linear-gradient(145deg, #132235, #0b1522);
+        border: 1px solid rgba(90, 157, 255, 0.2);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        color: var(--blue);
+        display: grid;
+        place-items: center;
+        font-size: 14px;
+      }
+
+      .brand strong {
+        font-size: 18px;
+      }
+
+      .brand span {
+        color: var(--blue);
+      }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 13px 18px;
+        border-radius: 14px;
+        font-size: 14px;
+        font-weight: 600;
+        border: 1px solid transparent;
+      }
+
+      .button.ghost {
+        border-color: rgba(90, 157, 255, 0.18);
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .button.primary {
+        background: var(--blue);
+        color: #07111d;
+        box-shadow: 0 16px 36px rgba(77, 141, 255, 0.24);
+      }
+
+      .hero {
+        max-width: 1360px;
+        margin: 0 auto;
+        padding: 58px 28px 26px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(90, 157, 255, 0.18);
+        background: rgba(77, 141, 255, 0.08);
+        color: var(--blue);
+        font-size: 13px;
+        margin-bottom: 18px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(3.4rem, 8vw, 6rem);
+        line-height: 0.94;
+        letter-spacing: -0.06em;
+      }
+
+      h1 .accent {
+        color: var(--blue);
+        text-shadow: 0 0 30px rgba(77, 141, 255, 0.24);
+      }
+
+      .hero-subtitle {
+        margin: 18px 0 0;
+        font-size: clamp(1.7rem, 3vw, 2.6rem);
+        font-weight: 700;
+        letter-spacing: -0.03em;
+      }
+
+      .hero-desc {
+        margin: 22px 0 0;
+        max-width: 620px;
+        color: var(--muted);
+        font-size: 18px;
+        line-height: 1.9;
+      }
+
+      .hero-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 30px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .hero-copy {
+        max-width: 920px;
+        margin: 0 auto;
+        text-align: center;
+      }
+
+      .hero-top {
+        display: block;
+      }
+
+      .hero-demo {
+        margin-top: 34px;
+      }
+
+      .demo {
+        border-radius: 30px;
+        background:
+          linear-gradient(180deg, rgba(16, 27, 42, 0.96), rgba(10, 18, 29, 0.98));
+        border: 1px solid rgba(90, 157, 255, 0.14);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .demo-body {
+        padding: 22px;
+        display: grid;
+        gap: 16px;
+      }
+
+      .demo-caption {
+        text-align: center;
+        max-width: 760px;
+        margin: 0 auto;
+      }
+
+      .demo-caption h2 {
+        margin: 0 0 10px;
+        font-size: 32px;
+        letter-spacing: -0.03em;
+      }
+
+      .demo-caption p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.85;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+        margin-bottom: 18px;
+      }
+
+      .stat-card {
+        padding: 22px 18px;
+        border-radius: 22px;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02));
+        border: 1px solid rgba(90, 157, 255, 0.12);
+        text-align: center;
+        min-height: 172px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .stat-value {
+        display: block;
+        margin-bottom: 10px;
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 700;
+        letter-spacing: -0.05em;
+        color: var(--text);
+      }
+
+      .stat-label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 15px;
+        font-weight: 600;
+      }
+
+      .stat-card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      .category-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 18px;
+      }
+
+      .category-card {
+        padding: 20px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(90, 157, 255, 0.12);
+        min-height: 184px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .category-card.highlight {
+        background:
+          radial-gradient(circle at top right, rgba(77, 141, 255, 0.18), transparent 42%),
+          linear-gradient(180deg, rgba(22, 41, 70, 0.94), rgba(11, 24, 42, 0.94));
+        border-color: rgba(90, 157, 255, 0.26);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.04),
+          0 18px 36px rgba(4, 12, 24, 0.24);
+      }
+
+      .category-card.highlight strong,
+      .category-card.highlight span {
+        color: var(--text);
+      }
+
+      .category-card strong {
+        display: block;
+        margin-bottom: 10px;
+        font-size: 16px;
+      }
+
+      .category-card span {
+        display: inline-block;
+        margin-bottom: 8px;
+        color: var(--blue);
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+      }
+
+      .category-card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.75;
+        margin-top: auto;
+      }
+
+      .content {
+        max-width: 1360px;
+        margin: 0 auto;
+        padding-left: 28px;
+        padding-right: 28px;
+      }
+
+      .metric,
+      .section {
+        background: var(--panel);
+        border: 1px solid rgba(90, 157, 255, 0.1);
+        border-radius: 24px;
+        box-shadow: var(--shadow);
+      }
+
+      .content {
+        display: grid;
+        gap: 18px;
+        padding-bottom: 78px;
+      }
+
+      .section {
+        padding: 28px;
+      }
+
+      .section-head {
+        margin-bottom: 22px;
+        text-align: center;
+      }
+
+      .section-head h2 {
+        margin: 0 0 8px;
+        font-size: 30px;
+        letter-spacing: -0.03em;
+      }
+
+      .section-head p {
+        margin: 0 auto;
+        max-width: 760px;
+        color: var(--muted);
+        line-height: 1.8;
+      }
+
+      .cards-3,
+      .cards-4,
+      .portal {
+        display: grid;
+        gap: 16px;
+      }
+
+      .cards-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .cards-4,
+      .portal {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .card {
+        padding: 20px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(90, 157, 255, 0.12);
+      }
+
+      .card-link {
+        display: block;
+        transition:
+          transform 160ms ease,
+          border-color 160ms ease,
+          background 160ms ease;
+      }
+
+      .card-link:hover {
+        transform: translateY(-2px);
+        border-color: rgba(90, 157, 255, 0.24);
+        background: rgba(77, 141, 255, 0.05);
+      }
+
+      .card h3 {
+        margin: 0 0 8px;
+        font-size: 18px;
+      }
+
+      .card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.8;
+      }
+
+      .site-footer {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        align-items: start;
+      }
+
+      .footer-block h3 {
+        margin: 0 0 12px;
+        font-size: 16px;
+      }
+
+      .footer-block p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.8;
+      }
+
+      .footer-links {
+        display: grid;
+        gap: 10px;
+      }
+
+      .footer-links a {
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .footer-links a:hover {
+        color: var(--text);
+      }
+
+      .footer-note {
+        margin-top: 24px;
+        padding-top: 18px;
+        border-top: 1px solid rgba(90, 157, 255, 0.08);
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .portal .button {
+        width: 100%;
+      }
+
+      @media (max-width: 1180px) {
+        .cards-3,
+        .cards-4,
+        .stats-grid,
+        .portal,
+        .site-footer {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 860px) {
+        .topbar-inner,
+        .hero,
+        .content {
+          padding-left: 18px;
+          padding-right: 18px;
+        }
+
+        .topbar-inner,
+        .section-head {
+          display: block;
+        }
+
+        .hero-panel,
+        .section {
+          padding: 22px;
+        }
+
+        .hero-actions {
+          margin-top: 12px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header class="topbar">
+        <div class="topbar-inner">
+          <div class="brand">
+            <div class="brand-mark">OB</div>
+            <strong>Octo<span>Bus</span></strong>
+          </div>
+          <a class="button ghost" href="https://github.com/chaitin/OctoBus">GitHub</a>
+        </div>
+      </header>
+
+      <section class="hero">
+        <div class="hero-top">
+          <div class="hero-copy">
+            <div class="eyebrow">OctoBus</div>
+            <h1>Octo<span class="accent">Bus</span></h1>
+            <div class="hero-subtitle">智能体企业能力调用平台</div>
+            <p class="hero-desc">
+              让智能体安全、可靠、可控地调用企业内部系统能力，仅允许执行被授权的业务动作，并完整记录每一次调用行为。
+            </p>
+            <div class="hero-actions">
+              <a class="button primary" href="#docs">查看文档</a>
+              <a class="button ghost" href="https://github.com/chaitin/OctoBus">GitHub 仓库</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <main class="content">
+        <section class="section">
+          <div class="section-head">
+            <div>
+              <h2>核心能力</h2>
+              <p>OctoBus 不直接替代业务系统，而是在智能体和企业内部能力之间建立一层更可控的调用边界。</p>
+            </div>
+          </div>
+          <div class="cards-3">
+            <article class="card">
+              <h3>安全接入企业内部能力</h3>
+              <p>把内部 API、工具和系统能力接入统一网关，避免让智能体直接面对原始系统。</p>
+            </article>
+            <article class="card">
+              <h3>仅执行被授权动作</h3>
+              <p>平台只暴露被选定的方法和动作，把调用范围收敛在明确的业务边界内。</p>
+            </article>
+            <article class="card">
+              <h3>调用行为完整留痕</h3>
+              <p>对调用请求、处理过程和执行结果保留记录，方便排查、复盘和后续治理。</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="docs">
+          <div class="section-head">
+              <div>
+              <h2>文档入口</h2>
+              <p>从产品文档、仓库说明和贡献指南进入公开说明、使用方式和参与路径。</p>
+              </div>
+          </div>
+          <div class="cards-4">
+            <a class="card card-link" href="https://github.com/chaitin/OctoBus/blob/main/README.zh-CN.md">
+              <h3>快速开始</h3>
+              <p>先看产品定位、启动方式、基础说明和第一次跑通流程。</p>
+            </a>
+            <a class="card card-link" href="https://github.com/chaitin/OctoBus/blob/main/README.md">
+              <h3>产品文档</h3>
+              <p>查看公开说明、基础命令、调用方式和仓库中的文档内容。</p>
+            </a>
+            <a class="card card-link" href="https://github.com/chaitin/OctoBus">
+              <h3>GitHub 仓库</h3>
+              <p>查看源码、目录结构、示例、更新记录和对外公开的项目信息。</p>
+            </a>
+            <a class="card card-link" href="https://github.com/chaitin/OctoBus/blob/main/CONTRIBUTING.zh-CN.md">
+              <h3>贡献指南</h3>
+              <p>查看贡献方式、提交要求、行为边界和参与项目的基本规则。</p>
+            </a>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <div>
+              <h2>当前能力覆盖</h2>
+              <p>当前仓库已沉淀 38 个能力包、23 个能力来源和 130 个可调用方法，已覆盖安全防护、检测研判、通知协同等常见场景。</p>
+            </div>
+          </div>
+          <div class="stats-grid">
+            <article class="stat-card">
+              <span class="stat-value">38</span>
+              <span class="stat-label">能力包</span>
+              <p>当前已沉淀的可复用能力包数量。</p>
+            </article>
+            <article class="stat-card">
+              <span class="stat-value">23</span>
+              <span class="stat-label">能力来源</span>
+              <p>覆盖不同厂商、系统和接入来源。</p>
+            </article>
+            <article class="stat-card">
+              <span class="stat-value">130</span>
+              <span class="stat-label">可调用方法</span>
+              <p>可继续选择、编排和暴露的调用方法数量。</p>
+            </article>
+          </div>
+          <div class="category-grid">
+            <article class="category-card">
+              <span>21</span>
+              <strong>安全防护</strong>
+              <p>覆盖防火墙、网关、WAF 以及相关边界处置能力。</p>
+            </article>
+            <article class="category-card">
+              <span>11</span>
+              <strong>检测研判</strong>
+              <p>覆盖检测分析、威胁情报和主机侧安全相关能力。</p>
+            </article>
+            <article class="category-card">
+              <span>6</span>
+              <strong>通知与辅助</strong>
+              <p>覆盖消息通知、基础网络能力和其他辅助接入能力。</p>
+            </article>
+            <article class="category-card highlight">
+              <span>持续扩展</span>
+              <strong>能力持续沉淀</strong>
+              <p>后续可按实际场景继续补充新的能力包和调用方法。</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <div>
+              <h2>参与与反馈</h2>
+              <p>查看仓库、参与贡献、签署协议或反馈安全与合规问题，都从这里进入。</p>
+            </div>
+          </div>
+          <div class="site-footer">
+            <div class="footer-block">
+              <h3>文档与仓库</h3>
+              <div class="footer-links">
+                <a href="https://github.com/chaitin/OctoBus/blob/main/README.zh-CN.md">快速开始</a>
+                <a href="https://github.com/chaitin/OctoBus">GitHub 仓库</a>
+                <a href="https://github.com/chaitin/OctoBus/blob/main/CONTRIBUTING.zh-CN.md">Contributing</a>
+                <a href="https://github.com/chaitin/OctoBus/blob/main/ICLA.zh-CN.md">ICLA</a>
+              </div>
+            </div>
+            <div class="footer-block">
+              <h3>反馈与支持</h3>
+              <div class="footer-links">
+                <a href="https://github.com/chaitin/OctoBus/blob/main/SECURITY.zh-CN.md">安全与合规反馈</a>
+                <a href="mailto:octobus-opensource@chaitin.com">octobus-opensource@chaitin.com</a>
+              </div>
+            </div>
+          </div>
+          <div class="footer-note">
+            OctoBus · 企业内部能力调用平台
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
