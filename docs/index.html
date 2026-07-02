@@ -1340,6 +1340,42 @@
         white-space: pre-wrap;
       }
 
+      .code-snippet {
+        position: relative;
+      }
+
+      .code-snippet code {
+        padding-right: 84px;
+      }
+
+      .copy-code {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 58px;
+        height: 30px;
+        border: 1px solid rgba(122, 176, 255, 0.22);
+        border-radius: 999px;
+        color: var(--blue-2);
+        background: rgba(93, 151, 255, 0.1);
+        font: inherit;
+        font-size: 12px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+
+      .copy-code:hover {
+        border-color: rgba(122, 176, 255, 0.42);
+        background: rgba(93, 151, 255, 0.16);
+      }
+
+      .model-note {
+        margin-top: 18px;
+      }
+
       .protocol-table {
         width: 100%;
         border-collapse: collapse;
@@ -2661,10 +2697,10 @@ octobus serve</pre>
               </div>
               <div
                 class="install-note"
-                data-zh="默认监听 127.0.0.1:9000，通过单一端口分发 admin API、gRPC、Connect RPC、MCP、OpenAPI 和 reflection。"
-                data-en="By default, OctoBus listens on 127.0.0.1:9000 and dispatches the admin API, gRPC, Connect RPC, MCP, OpenAPI, and reflection through one local port."
+                data-zh="默认监听 127.0.0.1:9000，通过单一端口分发 admin API、gRPC、Connect RPC、MCP、reflection，并提供 OpenAPI schema。"
+                data-en="By default, OctoBus listens on 127.0.0.1:9000 and dispatches the admin API, gRPC, Connect RPC, MCP, and reflection through one local port, with OpenAPI schema discovery."
               >
-                默认监听 127.0.0.1:9000，通过单一端口分发 admin API、gRPC、Connect RPC、MCP、OpenAPI 和 reflection。
+                默认监听 127.0.0.1:9000，通过单一端口分发 admin API、gRPC、Connect RPC、MCP、reflection，并提供 OpenAPI schema。
               </div>
             </div>
           </div>
@@ -2674,11 +2710,11 @@ octobus serve</pre>
       <main class="content">
         <section class="section">
           <div class="section-head">
-            <h2 data-zh="为什么需要 OctoBus" data-en="Why OctoBus">为什么需要 OctoBus</h2>
+            <h2 data-zh="OctoBus 解决什么" data-en="What OctoBus Solves">OctoBus 解决什么</h2>
           </div>
           <div class="cards-3">
             <article class="card">
-              <h3 data-zh="智能体不应该裸连内部系统" data-en="Agents should not connect to internal systems directly">智能体不应该裸连内部系统</h3>
+              <h3 data-zh="隔离内部系统访问" data-en="Isolate internal system access">隔离内部系统访问</h3>
               <p
                 data-zh="企业内部系统通常带有专有协议、敏感配置和强依赖上下文，不适合让智能体直接持有和调用。"
                 data-en="Internal systems usually come with proprietary protocols, sensitive configuration, and operational context that agents should not access directly."
@@ -2687,7 +2723,7 @@ octobus serve</pre>
               </p>
             </article>
             <article class="card">
-              <h3 data-zh="内部能力需要授权、配置和审计" data-en="Internal capabilities need authorization, configuration, and audit">内部能力需要授权、配置和审计</h3>
+              <h3 data-zh="按场景控制能力边界" data-en="Control capability scope by scenario">按场景控制能力边界</h3>
               <p
                 data-zh="不同场景、不同智能体和不同实例需要不同的权限边界、配置参数和调用记录。"
                 data-en="Different scenarios, agents, and instances require different permission boundaries, configuration, and audit records."
@@ -2696,7 +2732,7 @@ octobus serve</pre>
               </p>
             </article>
             <article class="card">
-              <h3 data-zh="MCP 工具需要统一网关" data-en="MCP tools need a unified gateway">MCP 工具需要统一网关</h3>
+              <h3 data-zh="统一开放 Agent 工具" data-en="Expose agent tools through one gateway">统一开放 Agent 工具</h3>
               <p
                 data-zh="不应该让 MCP 工具以零散脚本和独立进程的方式散落在各处，而应该统一接入、统一开放。"
                 data-en="MCP tools should not be scattered across scripts and standalone processes. They need a unified gateway and a consistent exposure model."
@@ -2707,100 +2743,17 @@ octobus serve</pre>
           </div>
         </section>
 
-        <section class="section runtime-section how-section">
+        <section class="section">
           <div class="section-head">
-            <span class="section-kicker" data-zh="How it works" data-en="How it works">How it works</span>
-            <h2 data-zh="How It Works" data-en="How It Works">How It Works</h2>
+            <h2 data-zh="工作原理" data-en="How It Works">工作原理</h2>
             <p
-              data-zh="Agent / Client 只面向 OctoBus 发起调用；OctoBus 负责导入服务包、管理实例生命周期、按 capset 选择能力，并通过多种协议暴露受控方法。"
-              data-en="Agent / Client calls OctoBus only. OctoBus imports service packages, manages instance lifecycle, selects capabilities by capset, and exposes controlled methods through multiple protocols."
+              data-zh="OctoBus 把内部服务整理成可授权、可审计、可通过标准协议调用的能力。"
+              data-en="OctoBus turns internal services into authorized, auditable capabilities exposed through standard protocols."
             >
-              Agent / Client 只面向 OctoBus 发起调用；OctoBus 负责导入服务包、管理实例生命周期、按 capset 选择能力，并通过多种协议暴露受控方法。
+              OctoBus 把内部服务整理成可授权、可审计、可通过标准协议调用的能力。
             </p>
           </div>
 
-          <div class="how-map" aria-label="OctoBus architecture diagram">
-            <div class="how-top-row">
-              <div class="how-node how-caller">
-                <span class="how-label" data-zh="调用方" data-en="Caller">调用方</span>
-                <strong>Agent / Client</strong>
-                <p data-zh="发起能力调用" data-en="Request capabilities">发起能力调用</p>
-              </div>
-
-              <span class="how-arrow how-arrow-right" aria-hidden="true"></span>
-
-              <div class="how-gateway">
-                <div class="how-gateway-head">
-                  <div class="how-brand">
-                    <img src="./assets/octobus-logo.png" alt="OctoBus logo" />
-                    <div>
-                      <strong>OctoBus</strong>
-                      <span data-zh="本地能力网关" data-en="Local capability gateway">本地能力网关</span>
-                    </div>
-                  </div>
-                  <div class="how-protocols" aria-label="Protocol exposure">
-                    <span>gRPC</span>
-                    <span>Connect RPC</span>
-                    <span>MCP</span>
-                    <span>OpenAPI</span>
-                  </div>
-                </div>
-
-                <div class="how-capabilities" aria-label="OctoBus responsibilities">
-                  <div class="how-capability">
-                    <b data-zh="Service package import" data-en="Service package import">Service package import</b>
-                  </div>
-                  <div class="how-capability">
-                    <b data-zh="Instance lifecycle" data-en="Instance lifecycle">Instance lifecycle</b>
-                  </div>
-                  <div class="how-capability featured">
-                    <b data-zh="Capset capability selection" data-en="Capset capability selection">Capset capability selection</b>
-                  </div>
-                  <div class="how-capability">
-                    <b data-zh="Protocol exposure" data-en="Protocol exposure">Protocol exposure</b>
-                  </div>
-                  <div class="how-capability">
-                    <b data-zh="SQLite registry" data-en="SQLite registry">SQLite registry</b>
-                  </div>
-                  <div class="how-capability">
-                    <b data-zh="Logs and runtime state" data-en="Logs and runtime state">Logs and runtime state</b>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="how-downlink" aria-hidden="true"></div>
-
-            <div class="how-chain">
-              <div class="how-node">
-                <span class="how-label">capset</span>
-                <strong>Capset</strong>
-                <p data-zh="面向 agent 或场景的一组能力" data-en="Capabilities for an agent or scenario">面向 agent 或场景的一组能力</p>
-              </div>
-
-              <span class="how-arrow how-arrow-right" aria-hidden="true"></span>
-
-              <div class="how-node how-node-primary">
-                <span class="how-label">instance</span>
-                <strong>Service Instance</strong>
-                <p data-zh="独立 config / secret / workdir" data-en="Isolated config / secret / workdir">独立 config / secret / workdir</p>
-              </div>
-
-              <span class="how-arrow how-arrow-right" aria-hidden="true"></span>
-
-              <div class="how-node">
-                <span class="how-label">service</span>
-                <strong>Node.js gRPC Service</strong>
-                <p data-zh="可导入的 Node.js 服务包实现" data-en="Importable Node.js service implementation">可导入的 Node.js 服务包实现</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="section">
-          <div class="section-head">
-            <h2 data-zh="核心概念" data-en="Core Concepts">核心概念</h2>
-          </div>
           <div class="cards-4">
             <article class="card">
               <span class="concept">service</span>
@@ -2839,6 +2792,9 @@ octobus serve</pre>
               </p>
             </article>
           </div>
+          <div class="list model-note">
+            <div class="list-item"><strong data-zh="OctoBus 围绕这些对象提供能力" data-en="OctoBus operates around these objects">OctoBus 围绕这些对象提供能力</strong> <span data-zh="包括 service package import、instance lifecycle、capset capability selection、gRPC / Connect RPC / MCP / OpenAPI exposure、SQLite registry、logs and runtime state。" data-en="including service package import, instance lifecycle, capset capability selection, gRPC / Connect RPC / MCP / OpenAPI exposure, SQLite registry, logs and runtime state.">包括 service package import、instance lifecycle、capset capability selection、gRPC / Connect RPC / MCP / OpenAPI exposure、SQLite registry、logs and runtime state。</span></div>
+          </div>
         </section>
 
         <section class="section" id="quickstart">
@@ -2856,8 +2812,11 @@ octobus serve</pre>
                 >
                   先启动本地 daemon，默认监听 localhost:9000。
                 </p>
-                <code>npm install -g @chaitin-ai/octobus
+                <div class="code-snippet">
+                  <button class="copy-code" type="button" data-copy-code data-zh="复制" data-en="Copy">复制</button>
+                  <code>npm install -g @chaitin-ai/octobus
 octobus serve</code>
+                </div>
               </div>
             </div>
             <div class="step">
@@ -2870,7 +2829,10 @@ octobus serve</code>
                 >
                   导入一个本地或 npm 分发的 Node.js gRPC 服务包。
                 </p>
-                <code>octobus service import ./examples/calculator-js</code>
+                <div class="code-snippet">
+                  <button class="copy-code" type="button" data-copy-code data-zh="复制" data-en="Copy">复制</button>
+                  <code>octobus service import calculator ./examples/calculator-js</code>
+                </div>
               </div>
             </div>
             <div class="step">
@@ -2883,7 +2845,10 @@ octobus serve</code>
                 >
                   创建带独立配置与工作目录的 service instance。
                 </p>
-                <code>octobus instance create calculator-test calculator-js</code>
+                <div class="code-snippet">
+                  <button class="copy-code" type="button" data-copy-code data-zh="复制" data-en="Copy">复制</button>
+                  <code>octobus instance create calculator-test --service calculator</code>
+                </div>
               </div>
             </div>
             <div class="step">
@@ -2896,8 +2861,11 @@ octobus serve</code>
                 >
                   创建 capset，添加 instance，并通过 Connect RPC / MCP / gRPC 调用方法。
                 </p>
-                <code>octobus capset create dev
+                <div class="code-snippet">
+                  <button class="copy-code" type="button" data-copy-code data-zh="复制" data-en="Copy">复制</button>
+                  <code>octobus capset create dev --name DevAgent
 octobus capset add-instance dev calculator-test</code>
+                </div>
               </div>
             </div>
           </div>
@@ -3003,50 +2971,6 @@ octobus capset add-instance dev calculator-test</code>
 
         <section class="section">
           <div class="section-head">
-            <h2 data-zh="生态与示例" data-en="Ecosystem / Examples">生态与示例</h2>
-          </div>
-          <div class="cards-4">
-            <article class="card">
-              <h3>calculator-js</h3>
-              <p
-                data-zh="最小 happy path 示例，用来验证本地 service import、instance 和 Connect RPC 调用流程。"
-                data-en="A minimal happy-path example for validating local service import, instance creation, and Connect RPC invocation."
-              >
-                最小 happy path 示例，用来验证本地 service import、instance 和 Connect RPC 调用流程。
-              </p>
-            </article>
-            <article class="card">
-              <h3>streaming-js</h3>
-              <p
-                data-zh="展示 long-running service 和 gRPC streaming 调用方式。"
-                data-en="Shows long-running service behavior and gRPC streaming invocation."
-              >
-                展示 long-running service 和 gRPC streaming 调用方式。
-              </p>
-            </article>
-            <article class="card">
-              <h3 data-zh="企业系统连接器" data-en="Enterprise Connectors">企业系统连接器</h3>
-              <p
-                data-zh="当前仓库包含 41 个 service package，覆盖安全产品与企业系统接入示例。"
-                data-en="The repository currently contains 41 service packages covering security products and enterprise system connector examples."
-              >
-                当前仓库包含 41 个 service package，覆盖安全产品与企业系统接入示例。
-              </p>
-            </article>
-            <article class="card">
-              <h3>OctoBus SDK</h3>
-              <p
-                data-zh="用于开发 Node.js 服务包的 SDK，提供运行时、descriptor、stub 和辅助工具。"
-                data-en="The SDK for building Node.js service packages, including runtime, descriptor, stub, and tooling support."
-              >
-                用于开发 Node.js 服务包的 SDK，提供运行时、descriptor、stub 和辅助工具。
-              </p>
-            </article>
-          </div>
-        </section>
-
-        <section class="section">
-          <div class="section-head">
             <h2 data-zh="社区入口" data-en="Community">社区入口</h2>
           </div>
           <div class="footer-links compact">
@@ -3063,10 +2987,6 @@ octobus capset add-instance dev calculator-test</code>
               <strong data-zh="快速开始" data-en="Get Started">快速开始</strong>
               <span data-zh="安装、启动方式和核心概念。" data-en="Install, run, and understand the core concepts.">安装、启动方式和核心概念。</span>
             </a>
-            <a class="footer-link" href="https://github.com/chaitin/OctoBus/tree/main/examples">
-              <strong data-zh="示例" data-en="Examples">示例</strong>
-              <span data-zh="查看 calculator、streaming 等示例。" data-en="Explore calculator, streaming, and other examples.">查看 calculator、streaming 等示例。</span>
-            </a>
             <a class="footer-link" href="https://github.com/chaitin/OctoBus/blob/main/CONTRIBUTING.md">
               <strong data-zh="参与贡献" data-en="Start Contributing">参与贡献</strong>
               <span data-zh="提交 service package、修复和改进。" data-en="Submit service packages, fixes, and improvements.">提交 service package、修复和改进。</span>
@@ -3078,6 +2998,10 @@ octobus capset add-instance dev calculator-test</code>
             <a class="footer-link" href="https://github.com/chaitin/OctoBus/issues">
               <strong data-zh="Issues" data-en="Issues">Issues</strong>
               <span data-zh="跟踪问题、需求和开放讨论。" data-en="Track bugs, requests, and open discussions.">跟踪问题、需求和开放讨论。</span>
+            </a>
+            <a class="footer-link" href="https://github.com/chaitin/OctoBus/releases">
+              <strong data-zh="Releases" data-en="Releases">Releases</strong>
+              <span data-zh="查看版本发布和更新记录。" data-en="View version releases and changelog.">查看版本发布和更新记录。</span>
             </a>
           </div>
         </section>
@@ -3093,8 +3017,10 @@ octobus capset add-instance dev calculator-test</code>
           zh: "OctoBus 是面向 AI Agent 的本地能力网关，把企业内部 gRPC/Node.js 服务安全、可控地暴露为 gRPC、Connect RPC、MCP 和 OpenAPI 能力。",
           en: "OctoBus is a local capability gateway for AI agents. It exposes internal gRPC and Node.js services as gRPC, Connect RPC, MCP, and OpenAPI capabilities in a secure and controllable way."
         };
+        let currentLang = "en";
 
         function setLang(lang) {
+          currentLang = lang;
           document.documentElement.lang = lang === "en" ? "en" : "zh-CN";
           const meta = document.querySelector('meta[name=\"description\"]');
           if (meta) meta.setAttribute("content", descriptions[lang]);
@@ -3111,6 +3037,35 @@ octobus capset add-instance dev calculator-test</code>
 
         buttons.forEach((button) => {
           button.addEventListener("click", () => setLang(button.getAttribute("data-set-lang")));
+        });
+
+        document.querySelectorAll("[data-copy-code]").forEach((button) => {
+          button.addEventListener("click", async () => {
+            const code = button.parentElement && button.parentElement.querySelector("code");
+            if (!code) return;
+            const text = code.textContent.trim();
+            try {
+              if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(text);
+              } else {
+                const textarea = document.createElement("textarea");
+                textarea.value = text;
+                textarea.setAttribute("readonly", "");
+                textarea.style.position = "fixed";
+                textarea.style.left = "-9999px";
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand("copy");
+                textarea.remove();
+              }
+              button.textContent = currentLang === "en" ? "Copied" : "已复制";
+              window.setTimeout(() => {
+                button.textContent = button.getAttribute(`data-${currentLang}`);
+              }, 1200);
+            } catch (error) {
+              button.textContent = currentLang === "en" ? "Copy failed" : "复制失败";
+            }
+          });
         });
 
         setLang("en");
